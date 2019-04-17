@@ -1,0 +1,98 @@
+---
+title: "Final Project"
+author: "Rohan Mashru"
+date: "April 16, 2019"
+output: 
+        html_document:
+                code_folding: hide
+---
+
+
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(error = FALSE)
+knitr::opts_chunk$set(message =  FALSE)
+library(tidyverse)
+```
+
+
+##Research Questions and Data Description
+The gapminder data (https://raw.githubusercontent.com/birdsarah/pydata-nc/master/tutorial/assets/gapminder.csv) will be used for the purpose of this project. There are 197 countries belonging to 6 continents. Data is collected about life expectancy, popultion and income from 1800 to 2015. Population is collected only once every 10 years beginning 1800, but 1950 onwards it is collected every year. However, there is a lot of missing data. 
+
+The research questions that we will be answering through this assignment are the following:
+
+
+###1. Five richest American Countries in 1997
+```{r}
+gapminder<-read.csv("C:/Users/trish/Documents/GitHub/exploratorydataanalytics/Data/gapminder.csv")
+
+gapminder %>%
+  filter(region == "America") %>%
+  filter(Year == 1997) %>%
+  select(Country, income) %>%
+  arrange(desc(income)) %>%
+  head(n = 5)
+```
+
+The five richest countires in America are displayed in 1997. United States is the richest as expected. Followed by Aruba and then Canada. United States is almost double of Bahamas which is the fifth richest. 
+
+
+###2. Average life expectancy for each continent in 2007
+```{r}
+gapminder %>%
+  filter(Year == 2007) %>%
+  group_by(region) %>%
+  summarize(averageExp = mean(life))
+```
+
+The life expectancy is the highest in Europe & Central Asia and then Middle East & North Africa. However, it is the lowest in Sub-Saharan Africa.  
+
+
+###3. Life expectancy per continent in 1950-1955
+```{r}
+gapminder %>%
+  filter(Year >= 1950 & Year <= 1955) %>%
+  group_by(region, Year) %>%
+  summarize(averageExp = mean(life))
+```
+
+We can see an increasing trend in life expectancy for each of the continents from 1950 to 1955. 
+
+```{r}
+gapminder %>%
+  ggplot(aes(x = Year, y = life, group=Country,
+             color=region)) +
+  geom_line() +
+  facet_wrap(~region, nrow = 2)
+```
+
+The above results are confirmed through this graph since we can see that there is an increasing trend in the life expectancy in each of the continents. Between 1800 to 1950, the life expectancy us almosy constant. 
+
+
+###4. Relationship between life expectancy and Income 
+```{r}
+gapminder %>%
+  filter(Year == 2015) %>%
+  ggplot(aes(x = income, y = life, color=region, label=Country)) +
+  geom_label() + scale_x_log10()
+```
+
+The sub-saharan countries have low income and life expectancy. We can see a direct relationship between income and life as higher income, higher the life expectancy and vice-versa. 
+
+
+###5. Average Population by Regions
+```{r}
+gapminder$population<-as.numeric(as.character(gapminder$population))
+
+gapminder %>%
+  group_by(region, Year) %>%
+  summarize(avgPop = mean(population)) %>%
+  ggplot(aes(x = Year, y = avgPop, group=region,
+             color=region)) +
+  geom_line()
+```
+
+South Asia has the highest population as expected with China and India being a part of the same. Sub-Saharan Africa has the lowest. Wee can see that 1950 onwards there is data collected for population every year. 
+
+
